@@ -54,50 +54,29 @@ namespace EmberPlusProviderClassLib.Model
                             int? sourceCount = null,
                             Func<Signal, IEnumerable<Signal>, Matrix, bool> remoteConnector = null)
         : base(number, parent, identifier, dispatcher, targets, sources, labelsNode, isWritable, targetCount, sourceCount, blindSource, remoteConnector)
-        {
-        }
+        { }
 
         protected override bool ConnectOverride(Signal target, IEnumerable<Signal> sources, ConnectOperation operation)
         {
+
+            if (target.Unused)
+                return false;
+
+            IEnumerable<Signal> blindSourceEnum = new Signal[] { BlindSource };
+            IEnumerable<Signal> firstSourceEnum = sources.Take(1);
+            Signal firstSource = sources.FirstOrDefault();
+            bool firstSourceUnused = (firstSource?.Unused == true);
+            IEnumerable<Signal> sourceToConnectEnum = firstSourceUnused ? blindSourceEnum : firstSourceEnum;
+
             switch (operation)
             {
                 case ConnectOperation.Absolute:
-
-                    // Get the first source that should be "On"
-                    var onSource = sources.Take(1);
-                    if (target.HasConnectedSources)
-                    {
-                        if (target.ConnectedSources.Contains(onSource.FirstOrDefault()))
-                        {
-                            // Trying to connect a connected source
-                            target.Connect(onSource, true);
-                        }
-                        else if (sources.Any() == false)
-                        {
-                            // On "right-click disconnect" in ember viewer sources might be empty
-                            target.Connect(new Signal[] { BlindSource }, true);
-                        }
-                        else
-                        {
-                            target.Connect(onSource, true);
-                        }
-                    }
-                    else
-                    {
-                        target.Connect(onSource, true);
-                    }
-                    break;
-  
                 case ConnectOperation.Connect:
-
-                    // Connect to the first source that is not blind
-                    target.Connect(sources.Take(1), true);
+                    target.Connect(sources.Any() ? sourceToConnectEnum : blindSourceEnum, true);
                     break;
-
                 case ConnectOperation.Disconnect:
-                    target.Connect(new Signal[] { BlindSource }, true);
+                    target.Connect(blindSourceEnum, true);
                     break;
-
                 default:
                     break;
             }
@@ -106,8 +85,7 @@ namespace EmberPlusProviderClassLib.Model
         }
 
         public override TResult Accept<TState, TResult>(IElementVisitor<TState, TResult> visitor, TState state)
-        {
-            return visitor.Visit(this, state);
-        }
+            => visitor.Visit(this, state);
+
     }
 }

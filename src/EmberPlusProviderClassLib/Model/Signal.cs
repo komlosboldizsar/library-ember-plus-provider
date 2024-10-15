@@ -29,20 +29,23 @@
  #endregion
 
 using System.Collections.Generic;
+using System.Linq;
 using EmberPlusProviderClassLib.Model.Parameters;
 
 namespace EmberPlusProviderClassLib.Model
 {
     public class Signal
     {
-        public Signal(int number, StringParameter labelParameter)
+        public Signal(int number, StringParameter labelParameter, bool unused = false)
         {
             Number = number;
             LabelParameter = labelParameter;
+            Unused = unused;
         }
 
         public int Number { get; }
         public StringParameter LabelParameter { get; }
+        public bool Unused { get; }
 
         public IEnumerable<Signal> ConnectedSources => _connectedSources;
 
@@ -55,7 +58,7 @@ namespace EmberPlusProviderClassLib.Model
             if (isAbsolute)
             {
                 _connectedSources.Clear();
-                _connectedSources.AddRange(sources);
+                _connectedSources.AddRange(sources.Where(s => !s.Unused));
             }
             else
             {

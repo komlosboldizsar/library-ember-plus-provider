@@ -36,12 +36,12 @@ namespace EmberPlusProviderClassLib.Model
 {
     public abstract class Element
     {
-        protected Element(int number, Element parent, string identifier)
+        protected Element(int number, Element parent, string identifier, string description = default)
         {
             Parent = parent;
             Number = number;
             Identifier = identifier;
-
+            Description = description;
             parent?.AddChild(this);
         }
 

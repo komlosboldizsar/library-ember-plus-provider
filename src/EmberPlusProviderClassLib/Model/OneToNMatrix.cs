@@ -48,41 +48,31 @@ namespace EmberPlusProviderClassLib.Model
                             int? sourceCount = null,
                             Func<Signal, IEnumerable<Signal>, Matrix, bool> remoteConnector = null)
         : base(number, parent, identifier, dispatcher, targets, sources, labelsNode, isWritable, targetCount, sourceCount, null, remoteConnector)
-        {
-        }
+        { }
 
         protected override bool ConnectOverride(Signal target, IEnumerable<Signal> sources, ConnectOperation operation)
         {
-            if (operation == ConnectOperation.Disconnect)
+            if (target.Unused)
+                return false;
+            switch (operation)
             {
-                target.Disconnect(sources);
-            }
-            else if (operation == ConnectOperation.Connect)
-            {
-                target.Connect(sources.Take(1), true);
-            }
-            else if (target.HasConnectedSources)
-            {
-                if (target.ConnectedSources.Contains(sources.FirstOrDefault()))
-                {
+                case ConnectOperation.Absolute:
+                case ConnectOperation.Connect:
+                    if (sources.FirstOrDefault()?.Unused == true)
+                        return false;
+                    target.Connect(sources.Take(1), true);
+                    break;
+                case ConnectOperation.Disconnect:
                     target.Disconnect(sources);
-                }
-                else
-                {
-                    target.Connect(sources.Take(1), operation == ConnectOperation.Absolute);
-                }
+                    break;
+                default:
+                    break;
             }
-            else
-            {
-                target.Connect(sources.Take(1), operation == ConnectOperation.Absolute);
-            }
-
             return true;
         }
 
         public override TResult Accept<TState, TResult>(IElementVisitor<TState, TResult> visitor, TState state)
-        {
-            return visitor.Visit(this, state);
-        }
+            => visitor.Visit(this, state);
+
     }
 }

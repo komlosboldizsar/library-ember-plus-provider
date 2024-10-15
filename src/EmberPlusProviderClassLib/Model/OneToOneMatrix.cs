@@ -48,37 +48,31 @@ namespace EmberPlusProviderClassLib.Model
                                 int? sourceCount = null,
                                 Func<Signal, IEnumerable<Signal>, Matrix, bool> remoteConnector = null)
         : base(number, parent, identifier, dispatcher, targets, sources, labelsNode, isWritable, targetCount, sourceCount, null, remoteConnector)
-        {
-        }
+        { }
 
         protected override bool ConnectOverride(Signal target, IEnumerable<Signal> sources, ConnectOperation operation)
         {
             sources = sources.Take(1);
-
-            var firstSource = sources.FirstOrDefault();
-
-            if(firstSource != null)
+            Signal firstSource = sources.FirstOrDefault();
+            IEnumerable<Signal> emptySignal = Enumerable.Empty<Signal>();
+            if (firstSource != null)
             {
-                foreach(var signal in Targets)
+                foreach(Signal iTgt in Targets)
                 {
-                    if(signal.ConnectedSources.Contains(firstSource))
+                    if(iTgt.ConnectedSources.Contains(firstSource))
                     {
-                        signal.Connect(Enumerable.Empty<Signal>(), true);
-
-                        Dispatcher.NotifyMatrixConnection(this, signal, null, ConnectOperation.Disconnect);
+                        iTgt.Connect(emptySignal, true);
+                        Dispatcher.NotifyMatrixConnection(this, iTgt, null, ConnectOperation.Disconnect);
                     }
                 }
-
                 target.Connect(sources, isAbsolute: true);
                 return true;
             }
-
             return false;
         }
 
         public override TResult Accept<TState, TResult>(IElementVisitor<TState, TResult> visitor, TState state)
-        {
-            return visitor.Visit(this, state);
-        }
+            => visitor.Visit(this, state);
+
     }
 }

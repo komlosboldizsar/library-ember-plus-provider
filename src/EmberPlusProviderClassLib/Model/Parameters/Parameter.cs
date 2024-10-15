@@ -36,14 +36,16 @@ namespace EmberPlusProviderClassLib.Model.Parameters
         where TParameter : Parameter<TValue, TParameter>
     {
 
-        protected Parameter(int number, Element parent, string identifier, Dispatcher dispatcher, bool isWritable, bool isPersistable = false, Func<TValue, TParameter, bool> remoteSetter = null)
+        protected Parameter(int number, Element parent, string identifier, Dispatcher dispatcher, bool isWritable, bool isPersistable = false, Func<TValue, TParameter, bool> remoteSetter = null, TValue value = default)
         : base(number, parent, identifier, dispatcher, isWritable, isPersistable)
         {
+            _value = value;
             _remoteSetter = remoteSetter;
         }
 
         private readonly Func<TValue, TParameter, bool> _remoteSetter;
 
+        private TValue _value;
         public TValue Value
         {
             get { return _value; }
@@ -70,8 +72,6 @@ namespace EmberPlusProviderClassLib.Model.Parameters
                     Value = value;
             }
         }
-
-        TValue _value;
 
     }
 }

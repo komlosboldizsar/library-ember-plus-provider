@@ -34,10 +34,9 @@ namespace EmberPlusProviderClassLib.Model
 {
     public class Node : Element
     {
-        public Node(int number, Element parent, string identifier)
-        : base(number, parent, identifier)
-        {
-        }
+        public Node(int number, Element parent, string identifier, string description = default)
+        : base(number, parent, identifier, description)
+        { }
 
         public override IEnumerable<Element> Children => _children;
 
