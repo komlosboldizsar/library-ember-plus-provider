@@ -33,32 +33,16 @@ using System.Diagnostics;
 
 namespace EmberPlusProviderClassLib.Model.Parameters
 {
-    public class StringParameter : Parameter<string>
+    public class StringParameter : Parameter<string, StringParameter>
     {
-        public StringParameter(int number, Element parent, string identifier, Dispatcher dispatcher, bool isWritable, bool isPersistable = false)
-        : base(number, parent, identifier, dispatcher, isWritable, isPersistable)
+
+        public StringParameter(int number, Element parent, string identifier, Dispatcher dispatcher, bool isWritable, bool isPersistable = false, Func<string, StringParameter, bool> remoteSetter = null)
+        : base(number, parent, identifier, dispatcher, isWritable, isPersistable, remoteSetter)
         {
         }
 
         public override TResult Accept<TState, TResult>(IElementVisitor<TState, TResult> visitor, TState state)
-        {
-            return visitor.Visit(this, state);
-        }
+            => visitor.Visit(this, state);
 
-        public override void SetValue(object newValue)
-        {
-            try
-            {
-                string s = Convert.ToString(newValue);
-                if (Value != s)
-                {
-                    Value = s;
-                }
-            }
-            catch(Exception)
-            {
-                Debug.WriteLine($"Failed to set string parameter {Identifier} value to {newValue}");
-            }
-        }
     }
 }

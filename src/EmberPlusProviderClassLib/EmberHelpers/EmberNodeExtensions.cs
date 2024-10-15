@@ -48,35 +48,35 @@ namespace EmberPlusProviderClassLib.EmberHelpers
             return new EmberNode(index, node, identifier, provider);
         }
 
-        public static StringParameter AddStringParameter(this Node node, int index, string identifier, EmberPlusProvider provider, bool isWritable, string value = "", string description = "", bool isPersistable = false)
+        public static StringParameter AddStringParameter(this Node node, int index, string identifier, EmberPlusProvider provider, bool isWritable, string value = "", string description = "", bool isPersistable = false, Func<string, StringParameter, bool> remoteSetter = null)
         {
             NodeAsserter.AssertIdentifierValid(identifier);
-            return new StringParameter(index, node, identifier, provider.dispatcher, isWritable, isPersistable) { Value = value, Description = description };
+            return new StringParameter(index, node, identifier, provider.dispatcher, isWritable, isPersistable, remoteSetter) { Value = value, Description = description };
         }
 
-        public static BooleanParameter AddBooleanParameter(this Node node, int index, string identifier, EmberPlusProvider provider, bool isWritable, bool value = false, string description = "", bool isPersistable = false)
+        public static BooleanParameter AddBooleanParameter(this Node node, int index, string identifier, EmberPlusProvider provider, bool isWritable, bool value = false, string description = "", bool isPersistable = false, Func<bool, BooleanParameter, bool> remoteSetter = null)
         {
             NodeAsserter.AssertIdentifierValid(identifier);
-            return new BooleanParameter(index, node, identifier, provider.dispatcher, isWritable, isPersistable) { Value = value, Description = description };
+            return new BooleanParameter(index, node, identifier, provider.dispatcher, isWritable, isPersistable, remoteSetter) { Value = value, Description = description };
         }
 
-        public static IntegerParameter AddIntegerParameter(this Node node, int index, string identifier, EmberPlusProvider provider, bool isWritable, int value = 0, int min = 0, int max = 255, string description = "", bool isPersistable = false)
+        public static IntegerParameter AddIntegerParameter(this Node node, int index, string identifier, EmberPlusProvider provider, bool isWritable, int value = 0, int min = 0, int max = 255, string description = "", bool isPersistable = false, Func<long, IntegerParameter, bool> remoteSetter = null)
         {
             NodeAsserter.AssertIdentifierValid(identifier);
-            return new IntegerParameter(index, node, identifier, provider.dispatcher, min, max, isWritable, isPersistable) { Value = value, Description = description };
+            return new IntegerParameter(index, node, identifier, provider.dispatcher, min, max, isWritable, isPersistable, remoteSetter) { Value = value, Description = description };
         }
 
-        public static EnumParameter AddEnumParameter(this Node node, int index, string identifier, EmberPlusProvider provider, bool isWritable = false, IEnumerable<string> enumValues = null, int value = 0, string description = "", bool isPersistable = false)
+        public static EnumParameter AddEnumParameter(this Node node, int index, string identifier, EmberPlusProvider provider, bool isWritable = false, IEnumerable<string> enumValues = null, int value = 0, string description = "", bool isPersistable = false, Func<long, EnumParameter, bool> remoteSetter = null)
         {
             NodeAsserter.AssertIdentifierValid(identifier);
             enumValues ??= new List<string>();
-            return new EnumParameter(index, node, identifier, provider.dispatcher, enumValues, isWritable, isPersistable) { Value = value, Description = description };
+            return new EnumParameter(index, node, identifier, provider.dispatcher, enumValues, isWritable, isPersistable, remoteSetter) { Value = value, Description = description };
         }
 
-        public static RealParameter AddRealParameter(this Node node, int index, string identifier, EmberPlusProvider provider, bool isWritable, double value = 0, double min = 0, double max = 255, string description = "", bool isPersistable = false)
+        public static RealParameter AddRealParameter(this Node node, int index, string identifier, EmberPlusProvider provider, bool isWritable, double value = 0, double min = 0, double max = 255, string description = "", bool isPersistable = false, Func<double, RealParameter, bool> remoteSetter = null)
         {
             NodeAsserter.AssertIdentifierValid(identifier);
-            return new RealParameter(index, node, identifier, provider.dispatcher, min, max, isWritable, isPersistable) { Value = value, Description = description };
+            return new RealParameter(index, node, identifier, provider.dispatcher, min, max, isWritable, isPersistable, remoteSetter) { Value = value, Description = description };
         }
 
         public static void AddFunction(this Node node, int index, string identifier, Tuple<string, int>[] arguments, Tuple<string, int>[] result, Func<GlowValue[], Task<GlowValue[]>> coreFunc)
@@ -85,7 +85,7 @@ namespace EmberPlusProviderClassLib.EmberHelpers
             new Function(index, node, identifier, arguments, result, coreFunc);
         }
 
-        public static OneToNMatrix AddMatrixOneToN(this Node node, int index, string identifier, string[] sourceNames, string[] targetNames, EmberPlusProvider provider, bool isWritable = true, string description = "", string matrixIdentifier = "matrix")
+        public static OneToNMatrix AddMatrixOneToN(this Node node, int index, string identifier, string[] sourceNames, string[] targetNames, EmberPlusProvider provider, bool isWritable = true, string description = "", string matrixIdentifier = "matrix", Func<Signal, IEnumerable<Signal>, Matrix, bool> remoteConnector = null)
         {
             
             var oneToN = new Node(index, node, identifier )
@@ -130,7 +130,8 @@ namespace EmberPlusProviderClassLib.EmberHelpers
                targets,
                sources,
                labels,
-               isWritable)
+               isWritable,
+               remoteConnector: remoteConnector)
             {
                 //SchemaIdentifier = "de.l-s-b.emberplus.matrix.oneToN"
             };
@@ -140,7 +141,7 @@ namespace EmberPlusProviderClassLib.EmberHelpers
             return matrix;
         }
 
-        public static OneToNBlindSourceMatrix AddMatrixOneToNBlindSource(this Node node, int index, string identifier, string[] sourceNames, string[] targetNames, string blindSourceName, EmberPlusProvider provider, bool isWritable = true, string description = "", string matrixIdentifier = "matrix")
+        public static OneToNBlindSourceMatrix AddMatrixOneToNBlindSource(this Node node, int index, string identifier, string[] sourceNames, string[] targetNames, string blindSourceName, EmberPlusProvider provider, bool isWritable = true, string description = "", string matrixIdentifier = "matrix", Func<Signal, IEnumerable<Signal>, Matrix, bool> remoteConnector = null)
         {
 
             var oneToN = new Node(index, node, identifier)
@@ -200,7 +201,8 @@ namespace EmberPlusProviderClassLib.EmberHelpers
                sources,
                blindSignal,
                labels,
-               isWritable)
+               isWritable,
+               remoteConnector: remoteConnector)
             {
                 //SchemaIdentifier = "de.l-s-b.emberplus.matrix.oneToN"
             };

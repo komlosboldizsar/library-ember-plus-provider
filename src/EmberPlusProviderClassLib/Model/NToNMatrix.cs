@@ -26,8 +26,9 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
- #endregion
+#endregion
 
+using System;
 using System.Collections.Generic;
 
 namespace EmberPlusProviderClassLib.Model
@@ -42,8 +43,9 @@ namespace EmberPlusProviderClassLib.Model
                             IEnumerable<Signal> sources,
                             Node labelsNode,
                             Node parametersNode,
-                            bool? isWritable = true)
-        : base(number, parent, identifier, dispatcher, targets, sources, labelsNode, isWritable, null, null, null)
+                            bool? isWritable = true,
+                            Func<Signal, IEnumerable<Signal>, Matrix, bool> remoteConnector = null)
+        : base(number, parent, identifier, dispatcher, targets, sources, labelsNode, isWritable, null, null, null, remoteConnector)
         {
             ParametersNode = parametersNode;
         }

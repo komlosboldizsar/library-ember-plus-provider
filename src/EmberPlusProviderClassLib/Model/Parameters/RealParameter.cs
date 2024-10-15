@@ -33,10 +33,11 @@ using System.Diagnostics;
 
 namespace EmberPlusProviderClassLib.Model.Parameters
 {
-    public class RealParameter : Parameter<double>
+    public class RealParameter : Parameter<double, RealParameter>
     {
-        public RealParameter(int number, Element parent, string identifier, Dispatcher dispatcher, double min, double max, bool isWritable, bool isPersistable = false)
-        : base(number, parent, identifier, dispatcher, isWritable, isPersistable)
+
+        public RealParameter(int number, Element parent, string identifier, Dispatcher dispatcher, double min, double max, bool isWritable, bool isPersistable = false, Func<double, RealParameter, bool> remoteSetter = null)
+        : base(number, parent, identifier, dispatcher, isWritable, isPersistable, remoteSetter)
         {
             Minimum = min;
             Maximum = max;
@@ -46,24 +47,7 @@ namespace EmberPlusProviderClassLib.Model.Parameters
         public double Maximum { get; private set; }
 
         public override TResult Accept<TState, TResult>(IElementVisitor<TState, TResult> visitor, TState state)
-        {
-            return visitor.Visit(this, state);
-        }
+            => visitor.Visit(this, state);
 
-        public override void SetValue(object newValue)
-        {
-            try
-            {
-                double b = Convert.ToDouble(newValue);
-                if (Value != b)
-                {
-                    Value = b;
-                }
-            }
-            catch(Exception)
-            {
-                Debug.WriteLine($"Failed to set real parameter {Identifier} value to {newValue}");
-            }
-        }
     }
 }

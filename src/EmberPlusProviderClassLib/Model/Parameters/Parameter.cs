@@ -26,18 +26,25 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
- #endregion
+#endregion
+
+using System;
 
 namespace EmberPlusProviderClassLib.Model.Parameters
 {
-    public abstract class Parameter<T> : ParameterBase
+    public abstract class Parameter<TValue, TParameter> : ParameterBase
+        where TParameter : Parameter<TValue, TParameter>
     {
-        protected Parameter(int number, Element parent, string identifier, Dispatcher dispatcher, bool isWritable, bool isPersistable = false)
+
+        protected Parameter(int number, Element parent, string identifier, Dispatcher dispatcher, bool isWritable, bool isPersistable = false, Func<TValue, TParameter, bool> remoteSetter = null)
         : base(number, parent, identifier, dispatcher, isWritable, isPersistable)
         {
+            _remoteSetter = remoteSetter;
         }
 
-        public T Value
+        private readonly Func<TValue, TParameter, bool> _remoteSetter;
+
+        public TValue Value
         {
             get { return _value; }
             set
@@ -50,8 +57,21 @@ namespace EmberPlusProviderClassLib.Model.Parameters
             }
         }
 
-        T _value;
+        public void SetValueRemote(TValue value)
+        {
+            lock (SyncRoot)
+            {
+                if (_remoteSetter == null)
+                {
+                    Value = value;
+                    return;
+                }
+                if (_remoteSetter?.Invoke(value, (TParameter)this) == true)
+                    Value = value;
+            }
+        }
 
-        public override object GetValue() { return Value; }
+        TValue _value;
+
     }
 }

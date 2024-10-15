@@ -33,32 +33,15 @@ using System.Diagnostics;
 
 namespace EmberPlusProviderClassLib.Model.Parameters
 {
-    public class BooleanParameter : Parameter<bool>
+    public class BooleanParameter : Parameter<bool, BooleanParameter>
     {
-        public BooleanParameter(int number, Element parent, string identifier, Dispatcher dispatcher, bool isWritable, bool isPersistable = false)
-        : base(number, parent, identifier, dispatcher, isWritable, isPersistable)
-        {
-        }
+
+        public BooleanParameter(int number, Element parent, string identifier, Dispatcher dispatcher, bool isWritable, bool isPersistable = false, Func<bool, BooleanParameter, bool> remoteSetter = null)
+        : base(number, parent, identifier, dispatcher, isWritable, isPersistable, remoteSetter)
+        { }
 
         public override TResult Accept<TState, TResult>(IElementVisitor<TState, TResult> visitor, TState state)
-        {
-            return visitor.Visit(this, state);
-        }
+            => visitor.Visit(this, state);
 
-        public override void SetValue(object newValue)
-        {
-            try
-            {
-                bool b = Convert.ToBoolean(newValue);
-                if (Value != b)
-                {
-                    Value = b;
-                }
-            }
-            catch(Exception)
-            {
-                Debug.WriteLine($"Failed to set boolean parameter {Identifier} value to {newValue}");
-            }
-        }
     }
 }

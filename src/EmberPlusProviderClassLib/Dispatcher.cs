@@ -300,54 +300,24 @@ namespace EmberPlusProviderClassLib
                         switch (glowValue.Type)
                         {
                             case GlowParameterType.Boolean:
-                                {
-                                    var booleanParameter = parameter as BooleanParameter;
-
-                                    if (booleanParameter != null)
-                                        booleanParameter.Value = glowValue.Boolean;
-
-                                    break;
-                                }
-
+                                (parameter as BooleanParameter)?.SetValueRemote(glowValue.Boolean);
+                                break;
                             case GlowParameterType.Integer:
-                                {
-                                    var integerParameter = parameter as IntegerParameter;
-
-                                    if (integerParameter != null)
-                                        integerParameter.Value = glowValue.Integer;
-
-                                    if (parameter is EnumParameter enumParameter)
-                                        enumParameter.Value = glowValue.Integer;
-
-                                    break;
-                                }
-
+                                (parameter as IntegerParameter)?.SetValueRemote(glowValue.Integer);
+                                (parameter as EnumParameter)?.SetValueRemote(glowValue.Integer);
+                                break;
                             case GlowParameterType.Real:
-                                {
-                                    var realParameter = parameter as RealParameter;
-
-                                    if (realParameter != null)
-                                        realParameter.Value = glowValue.Real;
-
-                                    break;
-                                }
-
+                                (parameter as RealParameter)?.SetValueRemote(glowValue.Real);
+                                break;
                             case GlowParameterType.String:
-                                {
-                                    var stringParameter = parameter as StringParameter;
-
-                                    if (stringParameter != null)
-                                        stringParameter.Value = glowValue.String;
-
-                                    break;
-                                }
+                                (parameter as StringParameter)?.SetValueRemote(glowValue.String);
+                                break;
                         }
                     }
                 }
                 else
                 {
-                    if (dynamicPathHandler != null)
-                        dynamicPathHandler.HandleParameter(glow, path, _source);
+                    dynamicPathHandler?.HandleParameter(glow, path, _source);
                 }
             }
 
@@ -380,7 +350,7 @@ namespace EmberPlusProviderClassLib
                                                 ? (ConnectOperation)connection.Operation.Value
                                                 : ConnectOperation.Absolute;
 
-                                matrix.Connect(target, sources, _source, operation);
+                                matrix.ConnectRemote(target, sources, _source, operation);
                             }
                         }
                     }

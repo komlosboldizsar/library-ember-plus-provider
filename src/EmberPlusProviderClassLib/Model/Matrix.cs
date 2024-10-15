@@ -47,21 +47,19 @@ namespace EmberPlusProviderClassLib.Model
                         bool? isWritable,
                         int? targetCount,
                         int? sourceCount,
-                        Signal blindSource)
+                        Signal blindSource,
+                        Func<Signal, IEnumerable<Signal>, Matrix, bool> remoteConnector = null)
         : base(number, parent, identifier)
         {
             Dispatcher = dispatcher;
             LabelsNode = labelsNode;
-
             IsWritable = isWritable ?? true;
-
             _targets = new List<Signal>(targets);
             _sources = new List<Signal>(sources);
-
             _targetCount = targetCount ?? _targets.Count;
             _sourceCount = sourceCount ?? _sources.Count;
-
             _blindSource = blindSource ?? null;
+            _remoteConnector = remoteConnector;
         }
 
         public Dispatcher Dispatcher { get; }
@@ -96,20 +94,8 @@ namespace EmberPlusProviderClassLib.Model
 
         public bool Connect(Signal target, IEnumerable<Signal> sources, object state, ConnectOperation operation = ConnectOperation.Absolute)
         {
-            if(_targets.Contains(target) == false)
-                throw new ArgumentException("target");
-
-            var firstSource = sources.FirstOrDefault();
-
-            if (firstSource != null)
-            {
-                if (_sources.Contains(firstSource) == false) {
-                    throw new ArgumentException("sources");
-                }
-            }
-
+            CheckConnectParameters(target, sources);
             var result = ConnectOverride(target, sources, operation);
-
             if (result)
             {
                 // absolute(0)
@@ -119,8 +105,26 @@ namespace EmberPlusProviderClassLib.Model
                 // Dispatcher.NotifyMatrixConnection(this, target, state, operation);
                 Dispatcher.NotifyMatrixConnection(this, target, state, ConnectOperation.Absolute);
             }
-
             return result;
+        }
+
+        public bool ConnectRemote(Signal target, IEnumerable<Signal> sources, object state, ConnectOperation operation = ConnectOperation.Absolute)
+        {
+            CheckConnectParameters(target, sources);
+            if ((_remoteConnector == null) || (_remoteConnector?.Invoke(target, sources, this) == true))
+                return Connect(target, sources, state, operation);
+            return false;
+        }
+
+        private Func<Signal, IEnumerable<Signal>, Matrix, bool> _remoteConnector;
+
+        private void CheckConnectParameters(Signal target, IEnumerable<Signal> sources)
+        {
+            if (_targets.Contains(target) == false)
+                throw new ArgumentException(nameof(target));
+            var firstSource = sources.FirstOrDefault();
+            if ((firstSource != null) && (_sources.Contains(firstSource) == false))
+                throw new ArgumentException(nameof(sources));
         }
 
         protected abstract bool ConnectOverride(Signal target, IEnumerable<Signal> sources, ConnectOperation operation);
@@ -130,6 +134,7 @@ namespace EmberPlusProviderClassLib.Model
         readonly Signal _blindSource;
         readonly int _targetCount;
         readonly int _sourceCount;
+
     }
 
     public enum ConnectOperation

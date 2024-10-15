@@ -47,10 +47,7 @@ namespace EmberPlusProviderClassLib.Model.Parameters
         /// </summary>
 		public bool IsPersistable { get; }
 
-        public abstract object GetValue();
-
         //public abstract new object GetParameterType();
 
-		public abstract void SetValue(object newValue);
 	}
 }

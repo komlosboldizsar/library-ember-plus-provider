@@ -33,10 +33,11 @@ using System.Diagnostics;
 
 namespace EmberPlusProviderClassLib.Model.Parameters
 {
-    public class IntegerParameter : Parameter<long>
+    public class IntegerParameter : Parameter<long, IntegerParameter>
     {
-        public IntegerParameter(int number, Element parent, string identifier, Dispatcher dispatcher, int min, int max, bool isWritable, bool isPersistable = false)
-        : base(number, parent, identifier, dispatcher, isWritable, isPersistable)
+
+        public IntegerParameter(int number, Element parent, string identifier, Dispatcher dispatcher, int min, int max, bool isWritable, bool isPersistable = false, Func<long, IntegerParameter, bool> remoteSetter = null)
+        : base(number, parent, identifier, dispatcher, isWritable, isPersistable, remoteSetter)
         {
             Minimum = min;
             Maximum = max;
@@ -46,24 +47,7 @@ namespace EmberPlusProviderClassLib.Model.Parameters
         public long Maximum { get; }
 
         public override TResult Accept<TState, TResult>(IElementVisitor<TState, TResult> visitor, TState state)
-        {
-            return visitor.Visit(this, state);
-        }
+            => visitor.Visit(this, state);
 
-        public override void SetValue(object newValue)
-        {
-            try
-            {
-                long l = Convert.ToInt32(newValue);
-                if (Value != l)
-                {
-                    Value = l;
-                }
-            }
-            catch(Exception)
-            {
-                Debug.WriteLine($"Failed to set integer parameter {Identifier} value to {newValue}");
-            }
-        }
     }
 }

@@ -51,8 +51,9 @@ namespace EmberPlusProviderClassLib.Model
                             Node labelsNode,
                             bool? isWritable = true,
                             int? targetCount = null,
-                            int? sourceCount = null)
-        : base(number, parent, identifier, dispatcher, targets, sources, labelsNode, isWritable, targetCount, sourceCount, blindSource)
+                            int? sourceCount = null,
+                            Func<Signal, IEnumerable<Signal>, Matrix, bool> remoteConnector = null)
+        : base(number, parent, identifier, dispatcher, targets, sources, labelsNode, isWritable, targetCount, sourceCount, blindSource, remoteConnector)
         {
         }
 
