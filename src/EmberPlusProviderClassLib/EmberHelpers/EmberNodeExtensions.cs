@@ -41,20 +41,11 @@ namespace EmberPlusProviderClassLib.EmberHelpers
 {
     public static class EmberNodeExtensions
     {
-        public static EmberNode AddSubNode(this Node node, ValueType identifier, EmberPlusProvider provider)
-        {
-            return AddSubNode(node, (int)identifier, identifier.ToString().Replace("_", " "), provider);
-        }
 
         public static EmberNode AddSubNode(this Node node, int index, string identifier, EmberPlusProvider provider)
         {
             NodeAsserter.AssertIdentifierValid(identifier);
             return new EmberNode(index, node, identifier, provider);
-        }
-
-        public static StringParameter AddStringParameter(this Node node, ValueType identifier, EmberPlusProvider provider, bool isWritable, string value = "", string description = "", bool isPersistable = false)
-        {
-            return AddStringParameter(node, (int)identifier, identifier.ToString().Replace("_", " "), provider, isWritable, value, description, isPersistable);
         }
 
         public static StringParameter AddStringParameter(this Node node, int index, string identifier, EmberPlusProvider provider, bool isWritable, string value = "", string description = "", bool isPersistable = false)
@@ -63,20 +54,10 @@ namespace EmberPlusProviderClassLib.EmberHelpers
             return new StringParameter(index, node, identifier, provider.dispatcher, isWritable, isPersistable) { Value = value, Description = description };
         }
 
-        public static BooleanParameter AddBooleanParameter(this Node node, ValueType identifier, EmberPlusProvider provider, bool isWritable, bool value = false, string description = "", bool isPersistable = false)
-        {
-            return AddBooleanParameter(node, (int)identifier, identifier.ToString().Replace("_", " "), provider, isWritable, value, description, isPersistable);
-        }
-
         public static BooleanParameter AddBooleanParameter(this Node node, int index, string identifier, EmberPlusProvider provider, bool isWritable, bool value = false, string description = "", bool isPersistable = false)
         {
             NodeAsserter.AssertIdentifierValid(identifier);
             return new BooleanParameter(index, node, identifier, provider.dispatcher, isWritable, isPersistable) { Value = value, Description = description };
-        }
-
-        public static IntegerParameter AddIntegerParameter(this Node node, ValueType identifier, EmberPlusProvider provider, bool isWritable, int value = 0, int min = 0, int max = 255, string description = "", bool isPersistable = false)
-        {
-            return AddIntegerParameter(node, (int) identifier, identifier.ToString().Replace("_", " "), provider, isWritable, value, min, max, description, isPersistable);
         }
 
         public static IntegerParameter AddIntegerParameter(this Node node, int index, string identifier, EmberPlusProvider provider, bool isWritable, int value = 0, int min = 0, int max = 255, string description = "", bool isPersistable = false)
@@ -98,20 +79,10 @@ namespace EmberPlusProviderClassLib.EmberHelpers
             return new RealParameter(index, node, identifier, provider.dispatcher, min, max, isWritable, isPersistable) { Value = value, Description = description };
         }
 
-        public static void AddFunction(this Node node, ValueType identifier, Tuple<string, int>[] arguments, Tuple<string, int>[] result, Func<GlowValue[], Task<GlowValue[]>> coreFunc)
-        {
-            node.AddFunction((int)identifier, identifier.ToString().Replace("_", " "), arguments, result, coreFunc);
-        }
-
         public static void AddFunction(this Node node, int index, string identifier, Tuple<string, int>[] arguments, Tuple<string, int>[] result, Func<GlowValue[], Task<GlowValue[]>> coreFunc)
         {
             NodeAsserter.AssertIdentifierValid(identifier);
             new Function(index, node, identifier, arguments, result, coreFunc);
-        }
-
-        public static OneToNMatrix AddMatrixOneToN(this Node node, ValueType identifier, string[] sourceNames, string[] targetNames, EmberPlusProvider provider, bool isWritable = true, string description = "", string matrixIdentifier = "matrix")
-        {
-            return AddMatrixOneToN(node, (int)identifier, identifier.ToString().Replace("_", " "), sourceNames, targetNames, provider, isWritable, description, matrixIdentifier);
         }
 
         public static OneToNMatrix AddMatrixOneToN(this Node node, int index, string identifier, string[] sourceNames, string[] targetNames, EmberPlusProvider provider, bool isWritable = true, string description = "", string matrixIdentifier = "matrix")
@@ -167,12 +138,6 @@ namespace EmberPlusProviderClassLib.EmberHelpers
             //foreach (var target in matrix.Targets)
             //    matrix.Connect(target, new[] { matrix.GetSource(target.Number) }, null);
             return matrix;
-        }
-
-
-        public static OneToNBlindSourceMatrix AddMatrixOneToNBlindSource(this Node node, ValueType identifier, string[] sourceNames, string[] targetNames, string blindSourceName, EmberPlusProvider provider, bool isWritable = true, string description = "", string matrixIdentifier = "matrix")
-        {
-            return AddMatrixOneToNBlindSource(node, (int)identifier, identifier.ToString().Replace("_", " "), sourceNames, targetNames, blindSourceName, provider, isWritable, description, matrixIdentifier);
         }
 
         public static OneToNBlindSourceMatrix AddMatrixOneToNBlindSource(this Node node, int index, string identifier, string[] sourceNames, string[] targetNames, string blindSourceName, EmberPlusProvider provider, bool isWritable = true, string description = "", string matrixIdentifier = "matrix")
@@ -252,14 +217,6 @@ namespace EmberPlusProviderClassLib.EmberHelpers
             return node.ResolveChild(new int[] { index }, out dph) as T;
         }
 
-        /// <summary>
-        /// Updates a string value node
-        /// </summary>
-        public static bool UpdateParameter(this Node node, ValueType identifier, string newValue)
-        {
-            return node.UpdateParameter((int)identifier, newValue);
-        }
-
         public static bool UpdateParameter(this Node node, int index, string newValue)
         {
             var p = node.GetParameter<StringParameter>(index);
@@ -270,14 +227,6 @@ namespace EmberPlusProviderClassLib.EmberHelpers
                 return true;
             }
             return false;
-        }
-
-        /// <summary>
-        /// Updates a boolean value node
-        /// </summary>
-        public static bool UpdateParameter(this Node node, ValueType identifier, bool newValue)
-        {
-            return node.UpdateParameter((int)identifier, newValue);
         }
 
         public static bool UpdateParameter(this Node node, int index, bool newValue)
@@ -292,14 +241,6 @@ namespace EmberPlusProviderClassLib.EmberHelpers
             return false;
         }
 
-        /// <summary>
-        /// Updates a long value node
-        /// </summary>
-        public static bool UpdateParameter(this Node node, ValueType identifier, long newValue)
-        {
-            return node.UpdateParameter((int)identifier, newValue);
-        }
-
         public static bool UpdateParameter(this Node node, int index, long newValue)
         {
             var p = node.GetParameter<IntegerParameter>(index);
@@ -310,52 +251,6 @@ namespace EmberPlusProviderClassLib.EmberHelpers
                 return true;
             }
             return false;
-        }
-
-        public static bool HasStringParameterWithValue(this Node node, ValueType identifier, string value)
-        {
-            value = (value ?? string.Empty).Trim().ToLower();
-            var parameterValue = node?.GetStringParameterValue(identifier, string.Empty);
-            return parameterValue?.ToLower() == value;
-        }
-
-        public static bool HasIntegerParameterWithValue(this Node node, ValueType identifier, long value)
-        {
-            long? parameterValue = node?.GetIntegerParameterValue(identifier);
-            return parameterValue.HasValue && parameterValue.Value == value;
-        }
-
-        public static string GetStringParameterValue(this Node node, ValueType identifier, string defaultValue = "")
-        {
-            return node.GetStringParameterValue(identifier.ToString(), defaultValue);
-        }
-
-        public static string GetStringParameterValue(this Node node, string name, string defaultValue = "")
-        {
-            var parameter = node.Children.FirstOrDefault(child => child.Identifier == name) as StringParameter;
-            return parameter == null ? defaultValue : parameter.Value;
-        }
-
-        public static bool GetBoooleanParameterValue(this Node node, ValueType identifier)
-        {
-            return node.GetBoooleanParameterValue(identifier.ToString());
-        }
-
-        public static bool GetBoooleanParameterValue(this Node node, string name)
-        {
-            var parameter = node.Children.FirstOrDefault(child => child.Identifier == name) as BooleanParameter;
-            return parameter?.Value ?? false;
-        }
-
-        public static long GetIntegerParameterValue(this Node node, ValueType identifier)
-        {
-            return node.GetIntegerParameterValue(identifier.ToString());
-        }
-
-        public static long GetIntegerParameterValue(this Node node, string name)
-        {
-            var parameter = node.Children.FirstOrDefault(child => child.Identifier == name) as IntegerParameter;
-            return parameter?.Value ?? 0;
         }
 
     }
