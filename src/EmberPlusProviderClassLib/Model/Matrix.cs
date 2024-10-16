@@ -92,7 +92,17 @@ namespace EmberPlusProviderClassLib.Model
                     .FirstOrDefault();
         }
 
-        public bool Connect(Signal target, IEnumerable<Signal> sources, object state, ConnectOperation operation = ConnectOperation.Absolute)
+        public bool Connect(int targetIndex, IEnumerable<int> sourceIndices, object state = default, ConnectOperation operation = ConnectOperation.Absolute)
+        {
+            Signal target = Targets.Skip(targetIndex).FirstOrDefault();
+            IEnumerable<Signal> sources = Sources.Where((s, i) => sourceIndices.Contains(i));
+            return Connect(target, sources, state, operation);
+        }
+
+        public bool Connect(int targetIndex, int sourceIndex, object state = default, ConnectOperation operation = ConnectOperation.Absolute)
+            => Connect(targetIndex, new int[] { sourceIndex }, state, operation);
+
+        public bool Connect(Signal target, IEnumerable<Signal> sources, object state = default, ConnectOperation operation = ConnectOperation.Absolute)
         {
             CheckConnectParameters(target, sources);
             var result = ConnectOverride(target, sources, operation);
@@ -108,7 +118,10 @@ namespace EmberPlusProviderClassLib.Model
             return result;
         }
 
-        public bool ConnectRemote(Signal target, IEnumerable<Signal> sources, object state, ConnectOperation operation = ConnectOperation.Absolute)
+        public bool Connect(Signal target, Signal source, object state = default, ConnectOperation operation = ConnectOperation.Absolute)
+            => Connect(target, new Signal[] { source }, state, operation);
+
+        public bool ConnectRemote(Signal target, IEnumerable<Signal> sources, object state = default, ConnectOperation operation = ConnectOperation.Absolute)
         {
             CheckConnectParameters(target, sources);
             if ((_remoteConnector == null) || (_remoteConnector?.Invoke(target, sources, this) == true))
